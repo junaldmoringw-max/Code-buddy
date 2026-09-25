@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CodeBuddy Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f0ff;--card:#fff;--ink:#231942;--mute:#6b6488;--brand:#6d28d9;--brand2:#a78bfa;--soft:#e9e0ff;--ok:#0f9d6b;--line:#d9ccf7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150f29;--card:#211a3d;--ink:#f1ebff;--mute:#a79fc7;--brand:#a78bfa;--brand2:#7c3aed;--soft:#2d2352;--line:#3a2f66}}
+:root[data-theme="dark"]{--bg:#150f29;--card:#211a3d;--ink:#f1ebff;--mute:#a79fc7;--brand:#a78bfa;--brand2:#7c3aed;--soft:#2d2352;--line:#3a2f66}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;line-height:1.5;min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:440px;padding:20px 18px 40px}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0;line-height:1.1}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.logo{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:800;font-size:22px;color:var(--brand)}
+.logo span{color:var(--ink)}
+.steps{display:flex;gap:6px}
+.dot{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.dot.on{background:var(--brand)}
+.screen{display:none}.screen.show{display:block}
+h2{font-size:32px;font-weight:800;margin-bottom:8px}
+p.sub{color:var(--mute);margin:0 0 20px}
+label{font-weight:600;display:block;margin:16px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;font:inherit;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;background:var(--card);color:var(--ink);resize:vertical}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--brand2);outline-offset:2px}
+.btn{width:100%;margin-top:20px;border:0;border-radius:14px;padding:14px;font:600 16px Figtree,sans-serif;background:var(--brand);color:#fff;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--brand);border:1.5px solid var(--line)}
+.err{color:#c0392b;font-size:14px;min-height:20px;margin-top:8px}
+.loader{text-align:center;padding:50px 0}
+.spin{width:46px;height:46px;border:5px solid var(--soft);border-top-color:var(--brand);border-radius:50%;margin:0 auto 16px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+.tutor{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;gap:12px;align-items:center}
+.av{width:48px;height:48px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font:800 18px 'Bricolage Grotesque',sans-serif;flex:none}
+.tutor h3{font-size:17px}
+.meta{font-size:13px;color:var(--mute)}
+.tutor .btn{width:auto;margin:0 0 0 auto;padding:9px 14px;font-size:14px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:22px;text-align:center}
+.bigav{width:72px;height:72px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font:800 26px 'Bricolage Grotesque',sans-serif;margin:0 auto 14px}
+.emailbox{background:var(--soft);border-radius:12px;padding:12px 14px;margin:16px 0;font-weight:600;word-break:break-all;color:var(--brand)}
+.copied{color:var(--ok);font-size:13px;min-height:18px;margin-top:6px}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:26px}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top">
+    <div class="logo">Code<span>Buddy</span></div>
+    <div class="steps" aria-hidden="true"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <section class="screen show" id="s1">
+    <h2>What are you stuck on?</h2>
+    <p class="sub">Tell us your problem and pick a senior student to reach out to.</p>
+    <label id="lg">Language</label>
+    <div class="chips" role="group" aria-labelledby="lg" id="chips"></div>
+    <label for="prob">Describe your problem</label>
+    <textarea id="prob" placeholder="Example: My C++ loop prints the same number forever."></textarea>
+    <div class="err" id="err1" role="alert"></div>
+    <button class="btn" id="find">Find a tutor</button>
+  </section>
+
+  <section class="screen" id="s2">
+    <div class="loader" id="load"><div class="spin"></div><h2 style="font-size:24px">Finding your tutor</h2><p class="sub">Matching by language and availability</p></div>
+    <div id="results" hidden>
+      <h2>3 tutors are online</h2>
+      <p class="sub">Pick one to get their contact email.</p>
+      <div id="tlist"></div>
+    </div>
+  </section>
+
+  <section class="screen" id="s3">
+    <div class="card">
+      <div class="bigav" id="bigav"></div>
+      <h2 style="font-size:24px" id="tname"></h2>
+      <div class="meta" id="tsub"></div>
+      <p class="sub" style="margin-top:14px">Email this tutor to set up your help session.</p>
+      <div class="emailbox" id="temail"></div>
+      <button class="btn" id="copy">Copy email</button>
+      <div class="copied" id="copied" role="status"></div>
+      <button class="btn ghost" id="back">Ask a different tutor</button>
+    </div>
+  </section>
+  <p class="note">Prototype only. Tutors and emails are sample data.</p>
+</main>
+
+<script>
+var langs=['C++','Python','Java','HTML/CSS'];
+var tutors=[
+ {n:'Mika R.',y:'4th year BSIT',l:'C++',r:'4.9',i:'M',e:'mika.r.tutor@dcc.edu.ph'},
+ {n:'Jerome D.',y:'3rd year BSIT',l:'C++, Java',r:'4.8',i:'J',e:'jerome.d.tutor@dcc.edu.ph'},
+ {n:'Alyssa T.',y:'4th year BSIT',l:'Python, C++',r:'4.7',i:'A',e:'alyssa.t.tutor@dcc.edu.ph'}
+];
+var lang='C++';
+function $(id){return document.getElementById(id)}
+function go(n){
+  var i,s=document.querySelectorAll('.screen');
+  for(i=0;i<s.length;i++)s[i].classList.remove('show');
+  $('s'+n).classList.add('show');
+  var d=document.querySelectorAll('.dot');
+  for(i=0;i<d.length;i++)d[i].classList.toggle('on',i<Math.min(n,3));
+  window.scrollTo(0,0);
+}
+function buildChips(){
+  var c=$('chips');c.innerHTML='';
+  langs.forEach(function(l){
+    var b=document.createElement('button');
+    b.className='chip';b.textContent=l;b.setAttribute('aria-pressed',l===lang);
+    b.onclick=function(){lang=l;buildChips()};
+    c.appendChild(b);
+  });
+}
+buildChips();
+$('find').onclick=function(){
+  if($('prob').value.trim().length<10){$('err1').textContent='Describe your problem in at least 10 characters.';return}
+  $('err1').textContent='';
+  $('load').hidden=false;$('results').hidden=true;go(2);
+  setTimeout(function(){
+    $('load').hidden=true;$('results').hidden=false;
+    var t=$('tlist');t.innerHTML='';
+    tutors.forEach(function(x,i){
+      var d=document.createElement('div');d.className='tutor';
+      d.innerHTML='<div class="av">'+x.i+'</div><div><h3>'+x.n+'</h3><div class="meta">'+x.y+' \u00b7 '+x.l+' \u00b7 \u2605 '+x.r+'</div></div>';
+      var b=document.createElement('button');b.className='btn';b.textContent='Select';
+      b.onclick=function(){showContact(i)};
+      d.appendChild(b);t.appendChild(d);
+    });
+  },1600);
+};
+function showContact(i){
+  var t=tutors[i];
+  $('bigav').textContent=t.i;
+  $('tname').textContent=t.n;
+  $('tsub').textContent=t.y+' \u00b7 '+t.l+' \u00b7 \u2605 '+t.r;
+  $('temail').textContent=t.e;
+  $('copied').textContent='';
+  go(3);
+}
+$('copy').onclick=function(){
+  var text=$('temail').textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){$('copied').textContent='Email copied'}).catch(function(){$('copied').textContent=text});
+  }else{$('copied').textContent=text}
+};
+$('back').onclick=function(){go(2)};
+</script>
+</body>
+</html>
